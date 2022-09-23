@@ -30,10 +30,21 @@ test('Get block no', async () => {
     expect(blockNo).not.toBeNaN();
 });
 
-test('Get outbound tansactions', async () => {
+test('Get outbound transactions', async () => {
     const rs = 'GMD-N2L2-GZXR-NES8-CJMBC';
     const data = await provider.getTransactions(true, rs, 1, 0);
     expect(Array.isArray(data)).toBe(true);
     expect(data[0].SENDER_ID).toBe(rs);
     expect(data[0].FULL_HASH).toMatch(keyRegex);
+});
+
+test('Get public key', async () => {
+    const data = await provider.getPublicKey('GMD-N2L2-GZXR-NES8-CJMBC');
+    expect(data.publicKey).toBe("f72258e2be98b5047c0cb4ff667b48a100699bf175122027aafd4182835f3c2e");
+});
+
+test('Get inexistent public key', async () => {
+    const data = await provider.getPublicKey('GMD-W2MZ-M9WK-G2LJ-WWWWW');
+    console.log(data);
+    expect(data.errorDescription).toBe("Incorrect \"account\"");
 });

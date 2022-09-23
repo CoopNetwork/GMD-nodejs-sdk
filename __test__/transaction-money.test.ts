@@ -13,9 +13,9 @@ jest.setTimeout(180000);
 test('Test send money', async () => {
     const wallet = await Wallet.fromPassphrase('screen drawn leave power connect confidence liquid everytime wall either poet shook');
 
-    const transaction = SendMoney.createTransaction('GMD-43MP-76UW-L69N-ALW39', '0.0001', wallet.publicKey);
+    const transaction = SendMoney.createTransaction('GMD-43MP-76UW-L69N-ALW39', '0.0001', wallet.publicKey as string);
 
-    //Optional: calculate fee. If fee is not calculated the default valur of 1 GMD will be attempted.
+    //Optional: calculate fee. If fee is not calculated the default value of 1 GMD will be attempted.
     ////////////
     const fee = await transaction.calculateFee(provider);
     console.log('fee is: ' + fee)
@@ -28,16 +28,16 @@ test('Test send money', async () => {
     expect(transaction.state).toBe(TransactionState.UNSIGNED);
     expect(transaction.unsignedTransactionBytes).toMatch(unsignedTransactionRegex);
 
-    const signResult = await transaction.signTransaction(wallet);
+    const signResult = await transaction.sign(wallet);
     expect(transaction.state).toBe(TransactionState.SIGNED);
     expect(transaction.signedTransactionBytes).toMatch(signedTransactionRegex);
     //console.log(signResult);
 
-    const resultBroadcast = await transaction.broadcastTransaction(provider);
+    const resultBroadcast = await transaction.broadcast(provider);
     expect(transaction.state).toBe(TransactionState.BROADCASTED);
     expect(resultBroadcast.fullHash).toMatch(keyRegex);
     expect(resultBroadcast.transaction).not.toBeNaN();
-    console.log('Submited for broadcast: ', resultBroadcast);
+    console.log('Submitted for broadcast: ', resultBroadcast);
 
     //comment the optional step of waiting for blockchain confirmation as it takes about one minute and tests would take too long
     //await transaction.waitConfirmation(provider); 
@@ -45,7 +45,7 @@ test('Test send money', async () => {
 
 test('Transaction from bytes', async () => {
     const wallet = await Wallet.fromPassphrase('screen drawn leave power connect confidence liquid everytime wall either poet shook');
-    const transaction = SendMoney.createTransaction('GMD-43MP-76UW-L69N-ALW39', '0.0001', wallet.publicKey);
+    const transaction = SendMoney.createTransaction('GMD-43MP-76UW-L69N-ALW39', '0.0001', wallet.publicKey as string);
     await transaction.createUnsignedTransaction(provider);
 
     const transactionJson2: ITransactionJSON = await Transaction.getTransactionJSONFromBytes(transaction.unsignedTransactionBytes as string, provider);

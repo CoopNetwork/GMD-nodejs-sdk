@@ -5,13 +5,16 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "type": "pwa-node",
+            "type": "node",
             "request": "launch",
-            "name": "Test",
-            "skipFiles": [
-                "<node_internals>/**"
+            "name": "Jest",
+            "program": "${workspaceRoot}/node_modules/jest/bin/jest.js",
+            "args": [
+                "-i"
             ],
-            "program": "${workspaceFolder}/__test__/main.test.js"
+             "skipFiles": [
+              "<node_internals>/**/*.js", "node_modules",
+            ]
         }
     ]
 }
