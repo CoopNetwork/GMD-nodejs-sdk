@@ -1,68 +1,34 @@
 import { CryptoUtil } from './crypto-util.js';
 import { KeyEncryption, IEncryptedJSON } from './key-encryption.js';
-import PassPhraseGenerator from './pass-gen.js'
+import PassPhraseGenerator from './pass-gen.js';
 import { Provider } from './provider.js';
 import { Signer } from './signer.js';
-import { SendMoney } from './transactions/send-money.js';
+import { WalletPublic } from './wallet-public.js';
 
 
-
+const keyRegex = /^[0-9a-fA-F]{64}$/;
+const rsRegex = /^GMD(-([2-9a-zA-Z]){4}){3}-([2-9a-zA-Z]){5}$/
 export class Wallet extends Signer {
-    accountId: string;
-    accountRS: string;
-    provider: Provider | null;
-    constructor(publicKey: string, privKey: string, accountId: string, provider: Provider | null = null) {
-        super(publicKey, privKey);
-        this.accountId = accountId;
-        this.accountRS = CryptoUtil.Crypto.accountIdToRS(accountId);
-        this.provider = provider;
-    }
-
-    connect(provider: Provider) {
-        this.provider = provider;
-    }
-
-    async getBalance(): Promise<string | undefined> {
-        this.checkProvider();
-        return this.provider?.getBalance(this.accountRS);
-
+    protected constructor(publicKey: string, privateKey: string, accountRS:string, provider: Provider | null = null ) {
+        super(publicKey, privateKey, accountRS, provider);
     }
 
     async sendGMD(to: string, amountGMD: string) {
         const transaction = await this.createUnsignedSendGMDTransaction(to, amountGMD);
-        await transaction.signTransaction(this);
-        await transaction.broadcastTransaction(this.provider as Provider);
+        await transaction.sign(this);
+        await transaction.broadcast(this.provider as Provider);
         return transaction;
     }
 
-    async createUnsignedSendGMDTransaction(to: string, amountGMD: string) {
-        this.checkProvider();
-        const transaction = SendMoney.createTransaction(to, amountGMD, this.publicKey);
-        await transaction.createUnsignedTransaction(this.provider as Provider);
-        return transaction;
+    static generatePassphrase(numberOfWords?: number): string {
+        return PassPhraseGenerator.generatePass(numberOfWords);
     }
 
-    async getTransactions(outbound: boolean, pageSize: number, page: number) {
-        this.checkProvider();
-        this.provider?.getTransactions(outbound, this.accountRS, pageSize, page);
-    }
-
-    async encrypt(password: string) {
-        return KeyEncryption.encryptHex(this.publicKey + this.privateKey, password);
-    }
-
-
-    private checkProvider() {
-        if (this.provider == null) {
-            throw new Error('Wallet operation requires a Provider to be connected');
-        }
-    }
 
     //static wallet creation functions
     static async fromPassphrase(passPhrase: string) {
         const { publicKey, privateKey } = await CryptoUtil.Crypto.getWalletDetails(passPhrase);
-        const accountId = await CryptoUtil.Crypto.publicKeyToAccountId(publicKey);
-        return new Wallet(publicKey, privateKey, accountId);
+        return Wallet.fromKey(publicKey, privateKey) as Promise<Wallet>;
     }
 
     static async encryptedJSONFromPassPhrase(passPhrase: string, encryptionPassword: string) {
@@ -74,15 +40,25 @@ export class Wallet extends Signer {
         const decrypted = await KeyEncryption.decryptToHex(encryptedJSON, encryptionPassword);
         const publicKey = decrypted.substring(0, 64);
         const privateKey = decrypted.substring(64);
-        const accountId = await CryptoUtil.Crypto.publicKeyToAccountId(publicKey);
-        return new Wallet(publicKey, privateKey, accountId);
+        return Wallet.fromKey(publicKey, privateKey) as Promise<Wallet>;
     }
 
-    static async accountIdFromPublicKey(publicKeyHex: string): Promise<string> {
-        return CryptoUtil.Crypto.publicKeyToAccountId(publicKeyHex);
+    static async fromRS(accountRS: string, provider: Provider): Promise<WalletPublic> {
+        const publicKeyResp = await provider.getPublicKey(accountRS);
+        let publicKey;
+        if( !publicKeyResp.errorDescription ) {
+            publicKey = publicKeyResp.publicKey;
+        }
+        return new WalletPublic(publicKey, accountRS, provider);
     }
-
-    static generatePassphrase(numberOfWords?: number): string {
-        return PassPhraseGenerator.generatePass(numberOfWords);
+    
+    static async fromKey(publicKey: string, privateKey?: string, provider: Provider | null = null): Promise<Wallet | WalletPublic> {
+        const accountRS = await CryptoUtil.Crypto.publicKeyToRSAccount(publicKey);
+                
+        if(privateKey){
+            return new Wallet(publicKey, privateKey, accountRS, provider);
+        } else {
+            return new WalletPublic(publicKey, accountRS, provider);
+        }
     }
 }

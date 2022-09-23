@@ -1,12 +1,14 @@
 import { CryptoUtil } from './crypto-util.js';
+import KeyEncryption from './key-encryption.js';
+import { Provider } from './provider.js';
+import { WalletPublic } from './wallet-public.js';
 import Converters = CryptoUtil.Converters;
 
-export class Signer {
-    publicKey: string;
+export class Signer extends WalletPublic{
     protected privateKey: string;
-    constructor(publicKey: string, privKey: string) {
-        this.publicKey = publicKey;
-        this.privateKey = privKey;
+    protected constructor(publicKey: string, privateKey: string, accountRS:string, provider: Provider | null = null) {
+        super(publicKey, accountRS, provider);
+        this.privateKey = privateKey;
     }
 
     async signTransactionBytes(unsignedTransactionHex: string): Promise<string> {
@@ -22,11 +24,7 @@ export class Signer {
         return this.signHex(Converters.strToHex(message));
     }
 
-    static verifySignatureHex(signature: string, unsignedHexMessage: string, publicKey: string): Promise<boolean> {
-        return CryptoUtil.Crypto.verifySignature(signature, unsignedHexMessage, publicKey);
-    }
-
-    static verifySignatureStr(signature: string, unsignedStrMessage: string, publicKey: string): Promise<boolean> {
-        return this.verifySignatureHex(signature, Converters.strToHex(unsignedStrMessage), publicKey);
+    async encrypt(password: string) {
+        return KeyEncryption.encryptHex(this.publicKey + this.privateKey, password);
     }
 }

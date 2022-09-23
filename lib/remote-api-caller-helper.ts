@@ -43,6 +43,10 @@ export class RemoteAPICallerHelper extends RemoteAPICaller {
     getTransaction(fullHash: string) {
         return this.apiCall<ITransactionJSON | IError>('get', { requestType: 'getTransaction', fullHash: fullHash });
     }
+
+    getPublicKey(rsAccount: string) {
+        return this.apiCall<{ publicKey?: string, errorDescription?: string}>('get', { requestType: 'getAccountPublicKey', account: rsAccount });
+    }
 }
 
 export interface IGetTransactionRequest {

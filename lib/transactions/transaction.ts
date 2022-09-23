@@ -90,7 +90,7 @@ export class Transaction {
 
 
     //========== Step 3 (local)=============
-    async signTransaction(signer: Signer) {
+    async sign(signer: Signer) {
         if (this.state === TransactionState.UNSIGNED && this.unsignedTransactionBytes && Converters.isHex(this.unsignedTransactionBytes)) {
             const signedTransactionBytes = await signer.signTransactionBytes(this.unsignedTransactionBytes);
             this.onSigned(signedTransactionBytes);
@@ -112,9 +112,9 @@ export class Transaction {
 
 
     //========== Step 4 (remote)=============
-    async broadcastTransaction(remote: RemoteAPICaller) {
+    async broadcast(remote: RemoteAPICaller) {
         if (this.canBroadcast() && this.signedTransactionBytes) {
-            const result: ITransactionBroadcasted = await this.broadCastTransactionFromHex(this.signedTransactionBytes, remote)
+            const result: ITransactionBroadcasted = await this.broadcastFromHex(this.signedTransactionBytes, remote)
             this.onBroadcasted(result);
             return result;
         } else {
@@ -122,7 +122,7 @@ export class Transaction {
         }
     }
 
-    broadCastTransactionFromHex(signedTransactionHex: string, remote: RemoteAPICaller): Promise<ITransactionBroadcasted> {
+    broadcastFromHex(signedTransactionHex: string, remote: RemoteAPICaller): Promise<ITransactionBroadcasted> {
         return remote.apiCall<ITransactionBroadcasted>('post', { requestType: 'broadcastTransaction', transactionBytes: signedTransactionHex });
     }
 
@@ -215,6 +215,7 @@ export class Transaction {
             transaction._unsignedTransactionBytes = bytes;
             transaction._state = TransactionState.UNSIGNED;
         }
+        return transaction;
     }
 
     /**
