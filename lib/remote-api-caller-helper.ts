@@ -18,7 +18,7 @@ export class RemoteAPICallerHelper extends RemoteAPICaller {
         return CryptoUtil.Crypto.NqtToGmd(nqt);
     }
 
-    async getTransactions(outbound: boolean, rsAccount: string, pageSize = 10, page = 0, type: number | null = null, subtype: number | null = null) {
+    async getTransactions<T>(outbound: boolean, rsAccount: string, pageSize = 10, page = 0, type: number | null = null, subtype: number | null = null) : Promise<Array<T>> {
         const request: IGetTransactionRequest = {
             requestType: 'getTransactionsBulk',
             pageSize: pageSize,
@@ -36,7 +36,7 @@ export class RemoteAPICallerHelper extends RemoteAPICaller {
         } else {
             request.filterByReceiver = rsAccount;
         }
-        const data = await this.apiCall<IGetTransactionsResponse>('get', request as unknown as Record<string, string | number | boolean>);
+        const data = await this.apiCall<IGetTransactionsResponse<T>>('get', request as unknown as Record<string, string | number | boolean>);
         return data.Transactions;
     }
 
@@ -63,6 +63,6 @@ interface IGetBalanceResponse {
     balanceNQT: string
 }
 
-interface IGetTransactionsResponse {
-    Transactions: Array<Record<string, string | number | boolean>>;
+interface IGetTransactionsResponse<T> {
+    Transactions: Array<T>;
 }

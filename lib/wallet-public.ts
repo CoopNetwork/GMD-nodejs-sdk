@@ -46,8 +46,8 @@ export class WalletPublic {
         return transaction;
     }
 
-    async getTransactions(outbound: boolean, pageSize: number, page: number) : Promise<Array<Record<string, string | number | boolean>>| undefined>  {
+    async getTransactions<T>(outbound: boolean, pageSize: number, page: number) : Promise<Array<T> | undefined>  {
         this.checkProvider();
-        return this.provider?.getTransactions(outbound, this.accountRS, pageSize, page);
+        return this.provider?.getTransactions<T>(outbound, this.accountRS, pageSize, page);
     }
 }
