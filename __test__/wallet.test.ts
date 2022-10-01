@@ -1,5 +1,5 @@
 import { expect, test } from '@jest/globals';
-import { Wallet, Provider } from '../dist/index.js';
+import { Wallet, Provider, CryptoUtil } from '../dist/index.js';
 import { TransactionState } from '../dist/transactions/transaction.js';
 
 
@@ -33,6 +33,7 @@ test('Wallet passphrase generation', async () => {
     console.log('New wallet generated: ' + JSON.stringify(wallet, null, 2));
     expect(wallet.publicKey).toMatch(keyRegex);
     expect(wallet.accountRS).toMatch(rsRegex);
+    expect(CryptoUtil.Crypto.isValidRS(wallet.accountRS)).toBe(true);
 })
 
 test('Get balance', async () => {
