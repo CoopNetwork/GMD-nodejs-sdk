@@ -6,8 +6,6 @@ import { Signer } from './signer.js';
 import { WalletPublic } from './wallet-public.js';
 
 
-const keyRegex = /^[0-9a-fA-F]{64}$/;
-const rsRegex = /^GMD(-([2-9a-zA-Z]){4}){3}-([2-9a-zA-Z]){5}$/
 export class Wallet extends Signer {
     protected constructor(publicKey: string, privateKey: string, accountRS:string, provider: Provider | null = null ) {
         super(publicKey, privateKey, accountRS, provider);

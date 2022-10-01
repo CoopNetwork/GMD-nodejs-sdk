@@ -1,10 +1,9 @@
-import { Provider } from '../dist/index.js';
+import { CryptoUtil, Provider } from '../dist/index.js';
 import { expect, test } from '@jest/globals';
 
 let provider = new Provider(new URL('https://node2.thecoopnetwork.io:6877'));
 const pageSize = 3;
 const keyRegex = /^[0-9a-fA-F]{64}$/;
-const rsRegex = /^GMD(\-([2-9a-zA-Z]){4}){3}\-([2-9a-zA-Z]){5}$/
 
 test('Get transactions bulk', async () => {
     const paramsGetTransactions = {
@@ -22,7 +21,7 @@ test('Get transactions bulk', async () => {
     const sender2 = data.Transactions[2].SENDER_ID;
     expect(fullhash0).toMatch(keyRegex);
     expect(height1).not.toBeNaN();
-    expect(sender2).toMatch(rsRegex);
+    expect(CryptoUtil.Crypto.isValidRS(''+sender2)).toBe(true);
 })
 
 test('Get block no', async () => {

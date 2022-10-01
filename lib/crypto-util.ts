@@ -189,6 +189,20 @@ export namespace CryptoUtil {
             return rsaddr.toString();
         }
 
+        export function isValidRS(rs: string) {
+            const rsAddr = new RSAddress();
+            return rsAddr.set(rs);
+        }
+
+        export function isValidRSWithSuggestions(rs: string) : {valid: boolean, suggestions: string[]} {
+            const rsAddr = new RSAddress();
+            const valid = rsAddr.set(rs);
+            return {valid: valid, suggestions: rsAddr.guess};            
+        }
+
+
+
+
         export function GmdToNqt(gmd: string): string {
             const regex = /^\d*(\.\d{1,8})?$/; //maximum 8 decimals
             if (regex.test(gmd)) {

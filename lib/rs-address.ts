@@ -312,14 +312,12 @@ export class RSAddress {
         adr = adr.replace(/(^\s+)|(\s+$)/g, '').toUpperCase();
 
         if (adr.indexOf("GMD-") == 0) adr = adr.substr(4);
-
+        let clean : Array<number> = [];
         if (adr.match(/^\d{1,20}$/g)) // account id
         {
             if (allow_accounts) return this.from_acc(adr);
         } else // address
         {
-            let clean = [];
-
             for (var i = 0; i < adr.length; i++) {
                 var pos = this.alphabet.indexOf(adr[i]);
 
@@ -329,7 +327,6 @@ export class RSAddress {
                 }
             }
         }
-        let clean: any[] = [];
         if (len == 16) // guess deletion
         {
             for (let i = 16; i >= 0; i--) {
