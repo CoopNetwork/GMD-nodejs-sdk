@@ -47,7 +47,21 @@ test('Wallet public create unsigned transaction', async () => {
     expect(transaction2.state).toBe(TransactionState.BROADCASTED);
     expect(resultBroadcast.fullHash).toMatch(keyRegex);
     expect(resultBroadcast.transaction).not.toBeNaN();
+});
 
+/**
+ * get last 3 inbound transactions and last 3 outbound transactions
+ */
+test('getTransactionHistory inbound', async () => {
+    const wallet = await Wallet.fromRS(rs, provider); //provider is always required to get the public key from RS
+    const transactionsInbound = wallet.getTransactions(false, 3, 0);
+    const transactionsOutbound = wallet.getTransactions(true, 3, 0);
+    console.log('inbound transactions for '+wallet.accountRS, await transactionsInbound);
+    console.log('outbound transactions for '+wallet.accountRS, await transactionsOutbound);
+    expect(await transactionsInbound).not.toBeUndefined();
+    expect(await transactionsOutbound).not.toBeUndefined();
+    expect(((await transactionsInbound)?.length as number) == 3).toBe(true);
+    expect(((await transactionsOutbound)?.length as number) >=2 ).toBe(true);
 });
 
 

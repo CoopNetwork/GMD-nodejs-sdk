@@ -53,7 +53,7 @@ test('Send GMD', async () => {
     console.log(JSON.stringify(transaction, null, 2));
 })
 
-test('Encryp decryp wallet', async () => {
+test('Encrypt decrypt wallet', async () => {
     const wallet = await Wallet.fromPassphrase(secretPassphrase);
     const encryptedJSON = await wallet.encrypt('password');
 
