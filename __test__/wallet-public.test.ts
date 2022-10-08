@@ -53,6 +53,7 @@ interface ITransactionFromHistory{
     SENDER_ID: string;
     FULL_HASH: string;
     HEIGHT: number;
+    RECIPIENT_ID: string;
     
         // {
         //   TRANSACTION_INDEX: 0,
