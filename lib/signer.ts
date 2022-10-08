@@ -6,9 +6,15 @@ import Converters = CryptoUtil.Converters;
 
 export class Signer extends WalletPublic{
     protected privateKey: string;
-    protected constructor(publicKey: string, privateKey: string, accountRS:string, provider: Provider | null = null) {
+    protected constructor(publicKey: string | undefined, privateKey: string, accountRS:string, provider: Provider | null = null) {
         super(publicKey, accountRS, provider);
         this.privateKey = privateKey;
+    }
+
+    override connect(provider: Provider): Signer {
+        const signer = new Signer(this.publicKey, this.privateKey, this.accountRS, provider);
+        signer.provider = provider;
+        return signer;
     }
 
     async signTransactionBytes(unsignedTransactionHex: string): Promise<string> {

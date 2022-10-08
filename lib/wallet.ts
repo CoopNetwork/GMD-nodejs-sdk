@@ -7,9 +7,16 @@ import { WalletPublic } from './wallet-public.js';
 
 
 export class Wallet extends Signer {
-    protected constructor(publicKey: string, privateKey: string, accountRS:string, provider: Provider | null = null ) {
+    protected constructor(publicKey: string | undefined, privateKey: string, accountRS:string, provider: Provider | null = null ) {
         super(publicKey, privateKey, accountRS, provider);
     }
+    
+    override connect(provider: Provider): Wallet {
+        const wallet = new Wallet(this.publicKey, this.privateKey, this.accountRS, provider);
+        wallet.provider = provider;
+        return wallet;
+    }
+
 
     async sendGMD(to: string, amountGMD: string) {
         const transaction = await this.createUnsignedSendGMDTransaction(to, amountGMD);

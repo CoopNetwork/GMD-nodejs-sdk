@@ -14,7 +14,9 @@ export class WalletPublic {
     } 
 
     connect(provider: Provider) {
-        this.provider = provider;
+        const wallet = new WalletPublic(this.publicKey, this.accountRS, provider);
+        wallet.provider = provider;
+        return wallet;
     }
 
     async getBalance(): Promise<string | undefined> {

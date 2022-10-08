@@ -33,11 +33,11 @@
     //recover wallet from encrypted json:
     let wallet = await Wallet.fromEncryptedJSON(encryptedJSON, "password example 123@@!"); 
 
-    //Any wallet operation requiring connection to remote node needs a provider. Provider may be set using wallet.connect(provider) For example wallet.getBallance() needs connectiion to a node.
+    //Any wallet operation requiring connection to remote node needs a provider. Provider may be set using wallet.connect(provider). connect() returns a new connected wallet. For example wallet.getBallance() needs connection to a node.
     
     const provider = new Provider(new URL('https://node.thecoopnetwork.io:6877'));
-    const wallet = await Wallet.fromPassphrase('some passphrase example of just a few words');
-    wallet.connect(provider);
+    let wallet = await Wallet.fromPassphrase('some passphrase example of just a few words');
+    wallet = wallet.connect(provider);
     const balance = await wallet.getBalance();
 
     

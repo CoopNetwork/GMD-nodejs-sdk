@@ -37,16 +37,16 @@ test('Wallet passphrase generation', async () => {
 })
 
 test('Get balance', async () => {
-    const wallet = await Wallet.fromPassphrase('screen drawn leave power connect confidence liquid everytime wall either poet shook');
-    wallet.connect(provider);
+    let wallet = await Wallet.fromPassphrase('screen drawn leave power connect confidence liquid everytime wall either poet shook');
+    wallet = wallet.connect(provider);
 
     const balance = await wallet.getBalance();
     expect(balance).not.toBeNaN();
 })
 
 test('Send GMD', async () => {
-    const wallet = await Wallet.fromPassphrase('screen drawn leave power connect confidence liquid everytime wall either poet shook');
-    wallet.connect(provider);
+    let wallet = await Wallet.fromPassphrase('screen drawn leave power connect confidence liquid everytime wall either poet shook');
+    wallet = wallet.connect(provider);
     const transaction = await wallet.sendGMD('GMD-43MP-76UW-L69N-ALW39', '0.0001');
     expect(transaction.signedTransactionBytes).toMatch(signedTransactionRegex);
     expect(transaction.state).toBe(TransactionState.BROADCASTED);
