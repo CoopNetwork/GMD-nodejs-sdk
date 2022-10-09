@@ -48,12 +48,14 @@ export class Wallet extends Signer {
         return Wallet.fromKey(publicKey, privateKey) as Promise<Wallet>;
     }
 
-    static async fromRS(accountRS: string, provider: Provider): Promise<WalletPublic> {
-        const publicKeyResp = await provider.getPublicKey(accountRS);
+    static async fromRS(accountRS: string, provider?: Provider): Promise<WalletPublic> {
         let publicKey;
-        if( !publicKeyResp.errorDescription ) {
-            publicKey = publicKeyResp.publicKey;
-        }
+        if(provider){
+            const publicKeyResp = await provider.getPublicKey(accountRS);
+            if( !publicKeyResp.errorDescription ) {
+                publicKey = publicKeyResp.publicKey;
+            }
+        }        
         return new WalletPublic(publicKey, accountRS, provider);
     }
     
