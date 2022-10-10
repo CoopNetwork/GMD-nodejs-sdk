@@ -19,13 +19,13 @@ export class WalletPublic {
         return wallet;
     }
 
-    async getBalance(): Promise<string | undefined> {
+    async getBalance(): Promise<string> {
         this.checkProvider();
-        return this.provider?.getBalance(this.accountRS);
+        return (this.provider as Provider).getBalance(this.accountRS);
     }
 
     protected checkProvider() {
-        if (this.provider == null) {
+        if (!this.provider) {
             throw new Error('Wallet operation requires a Provider to be connected');
         }
     }

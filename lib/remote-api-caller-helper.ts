@@ -1,8 +1,5 @@
-import { CryptoUtil } from "./crypto-util.js";
 import { RemoteAPICaller } from "./gmd-api-caller.js";
 import { IError, ITransactionJSON } from "./transactions/transaction.js";
-
-
 
 
 export class RemoteAPICallerHelper extends RemoteAPICaller {
@@ -14,8 +11,7 @@ export class RemoteAPICallerHelper extends RemoteAPICaller {
 
     async getBalance(rsAccount: string): Promise<string> {
         const data = await this.apiCall<IGetBalanceResponse>('get', { requestType: 'getBalance', account: rsAccount } as Record<string, string>);
-        const nqt = data.balanceNQT;
-        return CryptoUtil.Crypto.NqtToGmd(nqt);
+        return data.balanceNQT;
     }
 
     async getTransactions<T>(outbound: boolean, rsAccount: string, pageSize = 10, page = 0, type: number | null = null, subtype: number | null = null) : Promise<Array<T>> {
