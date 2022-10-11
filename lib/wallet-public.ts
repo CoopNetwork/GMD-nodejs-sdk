@@ -52,4 +52,8 @@ export class WalletPublic {
         this.checkProvider();
         return this.provider?.getTransactions<T>(outbound, this.accountRS, pageSize, page);
     }
+
+    get address() {
+        return this.accountRS;
+    }
 }
