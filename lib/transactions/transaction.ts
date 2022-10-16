@@ -201,6 +201,20 @@ export class Transaction {
         return this._signedTransactionBytes;
     }
 
+    get fullHash(): string | null {
+        return this._fullHash;
+    }
+
+    get transactionJSON(): ITransactionJSON | null {
+        return this._transactionJSON;
+    }
+
+    get transactionID(): string | null {
+        return this._transactionID;
+    }
+
+
+
     //static functions
     static createTransactionFromRequestJSON(requestJSON: IRequestJSON) {
         return new Transaction(requestJSON);

@@ -1,6 +1,6 @@
 import { expect, test } from '@jest/globals';
 
-import { SendMoney, Provider, Wallet } from '../dist/index.js';
+import { SendMoney, Provider, Wallet, CryptoUtil } from '../dist/index.js';
 import { TransactionState, ITransactionJSON, Transaction, TransactionType } from '../dist/transactions/transaction.js';
 
 const keyRegex = /^[0-9a-fA-F]{64}$/;
@@ -13,7 +13,7 @@ jest.setTimeout(180000);
 test('Test send money', async () => {
     const wallet = await Wallet.fromPassphrase('screen drawn leave power connect confidence liquid everytime wall either poet shook');
 
-    const transaction = SendMoney.createTransaction('GMD-43MP-76UW-L69N-ALW39', '0.0001', wallet.publicKey as string);
+    const transaction = SendMoney.createTransaction('GMD-43MP-76UW-L69N-ALW39', CryptoUtil.Crypto.GmdToNqt('0.0001'), wallet.publicKey as string);
 
     //Optional: calculate fee. If fee is not calculated the default value of 1 GMD will be attempted.
     ////////////
@@ -27,11 +27,12 @@ test('Test send money', async () => {
     await transaction.createUnsignedTransaction(provider);
     expect(transaction.state).toBe(TransactionState.UNSIGNED);
     expect(transaction.unsignedTransactionBytes).toMatch(unsignedTransactionRegex);
+    console.log('unsigned transaction bytes: ' + transaction.unsignedTransactionBytes);
 
     const signResult = await transaction.sign(wallet);
     expect(transaction.state).toBe(TransactionState.SIGNED);
     expect(transaction.signedTransactionBytes).toMatch(signedTransactionRegex);
-    //console.log(signResult);
+    console.log( 'signed transaction bytes' ,signResult);
 
     const resultBroadcast = await transaction.broadcast(provider);
     expect(transaction.state).toBe(TransactionState.BROADCASTED);
@@ -45,7 +46,7 @@ test('Test send money', async () => {
 
 test('Transaction from bytes', async () => {
     const wallet = await Wallet.fromPassphrase('screen drawn leave power connect confidence liquid everytime wall either poet shook');
-    const transaction = SendMoney.createTransaction('GMD-43MP-76UW-L69N-ALW39', '0.0001', wallet.publicKey as string);
+    const transaction = SendMoney.createTransaction('GMD-43MP-76UW-L69N-ALW39', CryptoUtil.Crypto.GmdToNqt('0.0001'), wallet.publicKey as string);
     await transaction.createUnsignedTransaction(provider);
 
     const transactionJson2: ITransactionJSON = await Transaction.getTransactionJSONFromBytes(transaction.unsignedTransactionBytes as string, provider);
