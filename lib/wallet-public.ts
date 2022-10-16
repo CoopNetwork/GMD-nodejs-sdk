@@ -43,7 +43,7 @@ export class WalletPublic {
         if( !this.publicKey ) {
             throw new Error('Public key is required');
         }
-        const transaction = SendMoney.createTransaction(to, amountGMD, this.publicKey);
+        const transaction = SendMoney.createTransaction(to, CryptoUtil.Crypto.GmdToNqt(amountGMD), this.publicKey);
         await transaction.createUnsignedTransaction(this.provider as Provider);
         return transaction;
     }

@@ -1,4 +1,3 @@
-import { CryptoUtil } from "../crypto-util.js";
 import { IRequestJSON, Transaction } from "./transaction.js";
 
 export class SendMoney extends Transaction {
@@ -11,15 +10,15 @@ export class SendMoney extends Transaction {
         super(requestJSON)
     }
 
-    public static createTransaction(recipient: string, amountGMD: string, senderPublicKey: string,
-        feeGMD = '1', deadline = 1440, message = ""): SendMoney {
+    public static createTransaction(recipient: string, amountNQT: string, senderPublicKey: string,
+        feeNQT = '100000000', deadline = 1440, message = ""): SendMoney {
 
         const reqJSON = {
             requestType: SendMoney.endpointName,
             recipient: recipient,
-            amountNQT: CryptoUtil.Crypto.GmdToNqt(amountGMD),
+            amountNQT: amountNQT,
             publicKey: senderPublicKey,
-            feeNQT: CryptoUtil.Crypto.GmdToNqt(feeGMD),
+            feeNQT: feeNQT,
             deadline: deadline,
             message: message
         }
