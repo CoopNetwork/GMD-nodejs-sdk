@@ -21,7 +21,7 @@ export enum TransactionState {
  * 2. Process request JSON to an unsigned transaction (remote API call to a node is necessary)
  * 3. Sign the unsigned transaction
  * 4. Broadcast the signed transaction (remote API call to a node is necessary)
- * 5. [Optional] Transaction is confirmed after the trasaction is written to the blockchain and at leat
+ * 5. [Optional] Transaction is confirmed after the transaction is written to the blockchain and at least
  *    one block is written on top of the transaction block (remote API call to a node is necessary).
  * 
  * The state of the transaction can only go through each step in the specified order.
@@ -248,10 +248,10 @@ export class Transaction {
 
     /**
      * 
-     * @param time time when the forgers for next block was retrieved (aprox current time) - relative time of the blockchain (in seconds since blockchain creation).
+     * @param time time when the forgers for next block was retrieved (approx current time) - relative time of the blockchain (in seconds since blockchain creation).
      * @param generators the array of first max 20 forgers that can generate current block
      * @param timeout the maximum time we can wait for a block to be generated in seconds
-     * @returns an array of sleep times in ms necessary for pauses between posible block generators of forgers. 
+     * @returns an array of sleep times in ms necessary for pauses between possible block generators of forgers. 
      * 
      * This logic can be best explained by example: if current time is 46358100s and we have 3 generators
      * that will have hit times of 46358130s, 46358145s, 4635867s this function will return 3 time values in ms [30000, 15000, 22000]
