@@ -13,6 +13,8 @@ const keyRegex = /^[0-9a-fA-F]{64}$/;
 const rsRegex = /^GMD(\-([2-9a-zA-Z]){4}){3}\-([2-9a-zA-Z]){5}$/
 const signedTransactionRegex = /^[0-9a-fA-F]{322,}$/
 
+jest.setTimeout(120000);
+
 test('Wallet from passphrase', async () => {
     const wallet = await Wallet.fromPassphrase(secretPassphrase);
     expect(wallet.publicKey).toBe(pubKey);

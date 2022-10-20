@@ -5,6 +5,8 @@ let provider = new Provider(new URL('https://node2.thecoopnetwork.io:6877'));
 const pageSize = 3;
 const keyRegex = /^[0-9a-fA-F]{64}$/;
 
+jest.setTimeout(120000);
+
 test('Get transactions bulk', async () => {
     const paramsGetTransactions = {
         requestType: 'getTransactionsBulk',

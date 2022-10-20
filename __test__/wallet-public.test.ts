@@ -7,6 +7,8 @@ const nodeURL = new URL('https://node2.thecoopnetwork.io:6877');
 const provider = new Provider(nodeURL);
 const keyRegex = /^[0-9a-fA-F]{64}$/;
 
+jest.setTimeout(120000);
+
 test('Wallet public create from public key', async () => {
     const wallet = await Wallet.fromKey(publicKey);
 
