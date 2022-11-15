@@ -62,11 +62,29 @@ export namespace CryptoUtil {
             return String.fromCharCode.apply(null, bytesArray);
         }
 
-        export function hexToDec(hex: string): string {
-            if (hex.length % 2) {
-                hex = '0' + hex;
+        export function hexToDec(s: string): string {
+            function add(n1: string , n2: string ) {
+                var c = 0, r = [];
+                var x = n1.split('').map(Number);
+                var y = n2.split('').map(Number);
+                while(x.length || y.length) {
+                    var s = (x.pop() || 0) + (y.pop() || 0) + c;
+                    r.unshift(s < 10 ? s : s - 10); 
+                    c = s < 10 ? 0 : 1;
+                }
+                if(c) r.unshift(c);
+                return r.join('');
             }
-            return BigInt('0x' + hex).toString(10);
+        
+            var dec = '0';
+            s.split('').forEach(function(chr) {
+                var n = parseInt(chr, 16);
+                for(var t = 8; t; t >>= 1) {
+                    dec = add(dec, dec);
+                    if(n & t) dec = add(dec, '1');
+                }
+            });
+            return dec;
         }
 
         export function byteArraysEqual(bytes1: number[], bytes2: number[]): boolean {
@@ -212,6 +230,11 @@ export namespace CryptoUtil {
                 }
                 d = d ? d : "";
                 d = d.padEnd(8, '0');
+                if(n===''){
+                    while (d.charAt(0) === '0') { //remove leading zeros
+                        d = d.slice(1);
+                    }    
+                }
                 const ret = n + d;
                 return ret ? ret : '0';
             } else {

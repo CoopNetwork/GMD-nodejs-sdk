@@ -3,7 +3,7 @@ import Converters = CryptoUtil.Converters;
 
 import webcrypto from "./get-crypto.js";
 
-const iterations = 223978;
+const defaultIterations = 2112;
 
 export interface IEncryptedJSON {
     iv: string;
@@ -45,7 +45,7 @@ export class KeyEncryption {
         return this.encryptHex(Converters.strToHex(message), password);
     }
 
-    public static async encryptBytes(bytes: number[], password: string): Promise<IEncryptedJSON> {
+    public static async encryptBytes(bytes: number[], password: string, iterations = defaultIterations): Promise<IEncryptedJSON> {
         const { iv, salt } = await this.generateIvAndSalt();
         const encryptionKey = await this.genEncryptionKeyFromPassword(password, salt, iterations);
         const encryptedByteArray = await webcrypto.subtle.encrypt({ name: "AES-GCM", iv: iv }, encryptionKey, new Uint8Array(bytes));
@@ -82,7 +82,7 @@ export class KeyEncryption {
         return Array.from(result);
     }
 
-    private static async decrypt(encryptedJSON: IEncryptedJSON, password: string): Promise<Uint8Array> {
+    private static async decrypt(encryptedJSON: IEncryptedJSON, password: string, iterations = defaultIterations): Promise<Uint8Array> {
         if (encryptedJSON && 'iv' in encryptedJSON && 'salt' in encryptedJSON && 'ciphertext' in encryptedJSON) {
             const ciphertext = Converters.hexToUint8(encryptedJSON.ciphertext);
             const iv = Converters.hexToUint8(encryptedJSON.iv);
@@ -122,7 +122,7 @@ export class KeyEncryption {
                 "name": "AES-GCM",
                 "length": 128
             },
-            false,
+            true,
             ["encrypt", "decrypt"]
         );
     }
