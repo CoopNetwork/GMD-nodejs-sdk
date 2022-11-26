@@ -8,9 +8,10 @@
             "type": "node",
             "request": "launch",
             "name": "Jest",
-            "program": "${workspaceRoot}/node_modules/jest/bin/jest.js",
+            "program": "${workspaceRoot}/node_modules/jest/bin/jest",
             "args": [
-                "-i"
+                "--config",
+                "${workspaceRoot}/jest.config.ts"
             ],
              "skipFiles": [
               "<node_internals>/**/*.js", "node_modules",
