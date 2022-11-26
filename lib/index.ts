@@ -6,7 +6,8 @@ import { Wallet } from "./wallet.js";
 import { KeyEncryption } from "./key-encryption.js"
 import { CryptoUtil } from "./crypto-util.js";
 import { WalletPublic } from "./wallet-public.js";
+import { BlockObserver, IBlockListener } from "./block-listener.js";
 
 export {
-    Wallet, WalletPublic, Provider, Signer, Transaction, TransactionState, SendMoney, KeyEncryption, CryptoUtil
+    Wallet, WalletPublic, Provider, Signer, Transaction, TransactionState, SendMoney, KeyEncryption, CryptoUtil, BlockObserver, IBlockListener
 }

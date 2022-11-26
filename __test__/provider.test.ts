@@ -33,7 +33,7 @@ test('Get block no', async () => {
 
 test('Get outbound transactions', async () => {
     const rs = 'GMD-N2L2-GZXR-NES8-CJMBC';
-    const data = await provider.getTransactions(true, rs, 1, 0);
+    const data = await provider.getTransactions(true, rs, 1, 0) as Array<{SENDER_ID: string, FULL_HASH:string}>;
     expect(Array.isArray(data)).toBe(true);
     expect(data[0].SENDER_ID).toBe(rs);
     expect(data[0].FULL_HASH).toMatch(keyRegex);
