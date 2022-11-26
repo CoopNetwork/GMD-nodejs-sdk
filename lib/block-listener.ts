@@ -52,7 +52,7 @@ export class BlockObserver {
         while(this.listening){
             if(this.isNodeHealthy){
                 try {
-                    await this.waitBlock(600);
+                    await this.waitBlock(300);
                 } catch (e) {
                     await this.checkHealth();
                     await new Promise(r => setTimeout(r, 5000));
@@ -70,7 +70,7 @@ export class BlockObserver {
         }
     }
 
-    private async checkHealth(){
+    public async checkHealth(){
         const nodeHealthy = await this.provider.isNodeHealthy();
         if(this.isNodeHealthy !== nodeHealthy){
             this.isNodeHealthy = nodeHealthy;
@@ -83,7 +83,7 @@ export class BlockObserver {
         this.listening = false;
     }
 
-    private async waitBlock(timeout = 0) {
+    public async waitBlock(timeout = 0) {
         const sleepTimes = await this.provider.getTimeUntilNextBlockGeneration(timeout);
         let drift = 0;
         for (const sleep of sleepTimes) {

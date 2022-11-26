@@ -19,4 +19,12 @@ export class Provider extends RemoteAPICallerHelper {
     public removeBlockListener(listener: IBlockListener){
         this.blockListener?.removeBlockListener(listener);
     }
+
+    public async waitForNewBlock(timeout_s: number){
+        if(!this.blockListener){
+            this.blockListener = BlockObserver.instance(this);
+        }
+        await this.blockListener.checkHealth();
+        return this.blockListener.waitBlock(timeout_s);
+    }
 }

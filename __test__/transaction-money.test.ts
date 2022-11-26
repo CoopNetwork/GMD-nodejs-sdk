@@ -41,7 +41,10 @@ test('Test send money', async () => {
     console.log('Submitted for broadcast: ', resultBroadcast);
 
     //comment the optional step of waiting for blockchain confirmation as it takes about one minute and tests would take too long
-    //await transaction.waitConfirmation(provider); 
+    // console.log('Waiting for blockchain confirmation...');
+    // await transaction.waitConfirmation(provider); 
+    // console.log('Transaction confirmed!');
+    // await new Promise(resolve => setTimeout(resolve, 1800000));
 });
 
 test('Transaction from bytes', async () => {

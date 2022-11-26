@@ -1,6 +1,6 @@
 import { CryptoUtil } from "../crypto-util.js";
 import { RemoteAPICaller } from "../gmd-api-caller.js";
-import { RemoteAPICallerHelper } from "../remote-api-caller-helper.js";
+import { Provider } from "../provider.js";
 import { Signer } from "../signer.js";
 
 import Converters = CryptoUtil.Converters;
@@ -148,27 +148,29 @@ export class Transaction {
      * Waits for a transaction to be written to the blockchain.
      * Statistical average for this wait is 30s, but it can take up to a few minutes depending on the number of active forgers.
      * 
-     * @param remote a provider
+     * @param provider a provider
      * @param timeout timeout of the wait in seconds.
      * @returns the confirmed transaction json
      */
-    public async waitConfirmation(remote: RemoteAPICallerHelper, timeout = 300) {
+     public async waitConfirmation(provider: Provider, timeout = 300) {
         if (this.canWaitConfirmation()) {
-            const sleepTimes = await Transaction.getTimeUntilNextBlockGeneration(remote, timeout);
-            let drift = 0;
-            for (const sleep of sleepTimes) {
-                const t0 = Date.now();
-                await new Promise(r => setTimeout(r, sleep - drift + 100)); //sleep until earliest next block can be generated + 100ms buffer
-                const response = await remote.getTransaction(this._fullHash as string);//getTRansaction returns either an error json (if transaction is not yet in the blockchain), either a transaction json
-                if (!Transaction.isErrorResponse(response)) {
-                    return this.onConfirmation(response as ITransactionJSON);
+            const startTime = Date.now();
+            do {
+                const height = await provider.waitForNewBlock(timeout);
+                if(height !== undefined) {
+                    let response;
+                    try {
+                        response = await provider.getTransaction(this._fullHash as string);
+                    } catch (error) {}
+                    if (!Transaction.isErrorResponse(response)) {
+                        return this.onConfirmation(response as ITransactionJSON);
+                    }
                 }
-                drift = Date.now() - t0 - sleep; //drift is the actual time it takes a loop to execute minus desired sleep time. Roughly 600ms in tests.
-            }
+                await new Promise(r => setTimeout(r, 5000));
+            } while (Date.now() - startTime < timeout * 1000);
         }
-        throw new Error('Cannot wait confirmation. Current Transaction state=' + this.state);
-
-    }
+        throw new Error('Transaction cannot be confirmed');
+     }
 
     public canWaitConfirmation() {
         return (this.state === TransactionState.BROADCASTED && this._fullHash != null)
@@ -230,51 +232,6 @@ export class Transaction {
             transaction._state = TransactionState.UNSIGNED;
         }
         return transaction;
-    }
-
-    /**
-     * 
-     * @param remote a provider. the provider is needed to retrieve the list of forgers and their hit times.
-     * @param timeout timeout of the wait in seconds.
-     * @returns an array of time deltas between forgers hit times.
-     */
-    private static async getTimeUntilNextBlockGeneration(remote: RemoteAPICallerHelper, timeout: number): Promise<number[]> {
-        const [timeRes, generatorsRes] = await Promise.all([
-            remote.apiCall<{ time: number }>('get', { requestType: "getTime" }),
-            remote.apiCall<INextBlockGenerators>('get', { requestType: "getNextBlockGenerators", limit: 20 })
-        ]);
-        return Transaction.getSleepTimesFromGenHitTimes(timeRes.time, generatorsRes.generators, timeout);
-    }
-
-    /**
-     * 
-     * @param time time when the forgers for next block was retrieved (approx current time) - relative time of the blockchain (in seconds since blockchain creation).
-     * @param generators the array of first max 20 forgers that can generate current block
-     * @param timeout the maximum time we can wait for a block to be generated in seconds
-     * @returns an array of sleep times in ms necessary for pauses between possible block generators of forgers. 
-     * 
-     * This logic can be best explained by example: if current time is 46358100s and we have 3 generators
-     * that will have hit times of 46358130s, 46358145s, 4635867s this function will return 3 time values in ms [30000, 15000, 22000]
-     * This array will be used to sleep between attempts to get the new block.
-     * 
-     */
-    private static getSleepTimesFromGenHitTimes(time: number, generators: Array<IForger>, timeout: number) {
-        const adjustedTime = time - 20; //there is a time drift of 20s on each GMD node
-        const sleepTimesMs: number[] = [];
-        let totalSleepTime = 0;
-        for (const gen of generators) {
-            const t = gen.hitTime - adjustedTime;
-            const delta = t - totalSleepTime;
-            if (t >= 0) {
-                if (t >= timeout) {
-                    break;
-                }
-                sleepTimesMs.push(delta * 1000);
-                totalSleepTime += delta;
-            }
-
-        }
-        return sleepTimesMs;
     }
 
     public static getTransactionJSONFromBytes(bytes: string, remote: RemoteAPICaller) {
