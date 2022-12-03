@@ -161,7 +161,9 @@ export class Transaction {
                     let response;
                     try {
                         response = await provider.getTransaction(this._fullHash as string);
-                    } catch (error) {}
+                    } catch (error) {
+                        //ignore
+                    }
                     if (!Transaction.isErrorResponse(response)) {
                         return this.onConfirmation(response as ITransactionJSON);
                     }
