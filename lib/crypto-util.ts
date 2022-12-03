@@ -64,11 +64,12 @@ export namespace CryptoUtil {
 
         export function hexToDec(s: string): string {
             function add(n1: string , n2: string ) {
-                var c = 0, r = [];
-                var x = n1.split('').map(Number);
-                var y = n2.split('').map(Number);
+                let c = 0;
+                const r = [];
+                const x = n1.split('').map(Number);
+                const y = n2.split('').map(Number);
                 while(x.length || y.length) {
-                    var s = (x.pop() || 0) + (y.pop() || 0) + c;
+                    const s = (x.pop() || 0) + (y.pop() || 0) + c;
                     r.unshift(s < 10 ? s : s - 10); 
                     c = s < 10 ? 0 : 1;
                 }
@@ -76,10 +77,10 @@ export namespace CryptoUtil {
                 return r.join('');
             }
         
-            var dec = '0';
+            let dec = '0';
             s.split('').forEach(function(chr) {
-                var n = parseInt(chr, 16);
-                for(var t = 8; t; t >>= 1) {
+                const n = parseInt(chr, 16);
+                for(let t = 8; t; t >>= 1) {
                     dec = add(dec, dec);
                     if(n & t) dec = add(dec, '1');
                 }

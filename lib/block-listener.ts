@@ -7,15 +7,11 @@ export class BlockObserver {
     
     private blockListeners: IBlockListener[] = [];
     private listening = false;
-    private height: number = 0;
+    private height = 0;
     private isNodeHealthy = false;
-    private static _instance: BlockObserver;
 
-    public static instance(provider: Provider): BlockObserver {
-        return this._instance || (this._instance = new this(provider));
-    }
 
-    private constructor(readonly provider: Provider) {}
+    public constructor(readonly provider: Provider) {}
 
     public addBlockListener(listener: IBlockListener){
         this.blockListeners.push(listener);
@@ -29,7 +25,9 @@ export class BlockObserver {
         this.blockListeners = this.blockListeners.filter(l => l !== listener);
         if(this.blockListeners.length === 0){
             this.stopListening();
+            return true;
         }
+        return false;
     }
 
     public removeAllBlockListeners(){
@@ -43,12 +41,16 @@ export class BlockObserver {
 
     private emitNodeHealthEvent(healthy: boolean){
         this.blockListeners.forEach(l => l.onNodeHealthChange(healthy));
-    };
+    }
 
     private async startListening(){
-        this.provider.getBlockNumber();
         this.checkHealthLoop();
-        this.height = await this.provider.getBlockNumber();
+        try {
+            this.height = await this.provider.getBlockNumber();
+        } catch (e) {
+            this.checkHealth();
+        }
+        
         while(this.listening){
             if(this.isNodeHealthy){
                 try {
